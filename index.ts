@@ -13,7 +13,10 @@ const cfg = {
   },
 
   promptForSearchUrl() {
-    const url = prompt("Enter search URL (use %s where the search term should go):", this.searchUrl)
+    const url = prompt(
+      "Enter search URL (use %s where the search term should go):",
+      this.searchUrl
+    )
     if (url) {
       this.searchUrl = url
       alert("Search URL updated.")
@@ -28,7 +31,9 @@ GM_registerMenuCommand("Set search URL", function () {
 })
 
 function main() {
-  const elements = document.querySelectorAll<HTMLElement>(".SimklTVProfilePosterEpisodeText")
+  const elements = document.querySelectorAll<HTMLElement>(
+    ".SimklTVProfilePosterEpisodeText"
+  )
 
   elements.forEach((element) => {
     try {
@@ -56,7 +61,12 @@ function main() {
   ) as HTMLDivElement | null
 
   if (secondaryTitleElement) {
-    const searchQuery = (secondaryTitleElement.innerText || mainTitleElement?.innerText) ?? ""
+    let searchQuery =
+      (secondaryTitleElement.innerText || mainTitleElement?.innerText) ?? ""
+
+    if (searchQuery.match(/season [0-9]+ season [0-9]+/i)) {
+      searchQuery = searchQuery.replace(/(season [0-9]+) season [0-9]+/i, "$1")
+    }
 
     // replace the element by a link to a search of it's inner text
     const searchUrlWithQuery = cfg.searchUrl.replace("%s", searchQuery)
@@ -65,7 +75,8 @@ function main() {
     link.href = searchUrlWithQuery
 
     //get the main part of the domain name of the url
-    const domain = searchUrlWithQuery.match(/https?:\/\/([^/]+)/)?.[1] ?? "unknown"
+    const domain =
+      searchUrlWithQuery.match(/https?:\/\/([^/]+)/)?.[1] ?? "unknown"
 
     link.target = "_blank"
     link.rel = "noopener noreferrer"
