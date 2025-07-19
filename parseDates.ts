@@ -1,8 +1,21 @@
 import * as A from "arcsecond"
 
-const days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"]
+const days = [
+  "Sunday",
+  "Monday",
+  "Tuesday",
+  "Wednesday",
+  "Thursday",
+  "Friday",
+  "Saturday",
+]
 
-function parseDayTimeToDate(day: string, hour: number, minute: number, period: string) {
+function parseDayTimeToDate(
+  day: string,
+  hour: number,
+  minute: number,
+  period: string
+) {
   const toDay = new Date()
   const date = new Date()
 
@@ -46,7 +59,11 @@ const typeOneParser = A.sequenceOf([
   return parseDayTimeToDate(day, hour, minute, period)
 })
 
-const typeTwoParser = A.sequenceOf([A.str("Next"), A.str(" "), A.choice(days.map(A.str))]).map(([, , day]) => {
+const typeTwoParser = A.sequenceOf([
+  A.str("Next"),
+  A.str(" "),
+  A.choice(days.map(A.str)),
+]).map(([, , day]) => {
   const now = new Date()
   const currentDayIndex = now.getDay()
   const targetDayIndex = days.indexOf(day)
@@ -73,7 +90,23 @@ const typeThreeParser = A.sequenceOf([
   return new Date(year, month - 1, day)
 })
 
-const dateParser = A.choice([typeOneParser, typeTwoParser, typeThreeParser])
+const typeFourParser = A.sequenceOf([
+  A.str("Airing, "),
+  A.exactly(2)(A.digit).map(concatenateAndParseInt),
+  A.str(":"),
+  A.exactly(2)(A.digit).map(concatenateAndParseInt),
+  A.str(" "),
+  A.choice([A.str("AM"), A.str("PM")]),
+]).map(([, hour, , minute, , period]) => {
+  return parseDayTimeToDate("Today", hour, minute, period)
+})
+
+const dateParser = A.choice([
+  typeOneParser,
+  typeTwoParser,
+  typeThreeParser,
+  typeFourParser,
+])
 
 function parseDate(date: string) {
   const res = dateParser.run(date)
