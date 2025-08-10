@@ -62,7 +62,7 @@ function main() {
 
   if (secondaryTitleElement) {
     let searchQuery =
-      (secondaryTitleElement.innerText || mainTitleElement?.innerText) ?? ""
+      (mainTitleElement?.innerText || secondaryTitleElement?.innerText) ?? ""
 
     if (searchQuery.match(/season [0-9]+ season [0-9]+/i)) {
       searchQuery = searchQuery.replace(/(season [0-9]+) season [0-9]+/i, "$1")
